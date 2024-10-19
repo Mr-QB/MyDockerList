@@ -1,0 +1,38 @@
+# Begin config:
+  ## sudo blkid
+  ## sudo nano /etc/fstab
+  ## UUID=6f87c5e5-7288-4761-8dd4-1bf7e5ad0b3e /mnt/sdb1 ext4 defaults 0 2
+  ## export PUID=$(id -u)
+  ## export PGID=$(id -g)
+
+
+version: '3'
+services:
+  aria2-ui:
+    image: hurlenko/aria2-ariang
+    container_name: aria2-ui
+    restart: always
+    ports:
+      - 6801:8080
+    volumes:
+      - /mnt/sdb1/cloud/download:/aria2/data
+      - /mnt/sdb1/cloud/Plex_Movies:/aria2/Plex_Movies
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - ARIA2RPCPORT=443
+      - RPC_SECRET=NOBODYKNOWSME
+
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    restart: always
+    volumes:
+      - /mnt/sdb1/cloud:/srv # Change to match your directory
+      - /mnt/sdb1/.docker/filebrowser/filebrowser.db:/database/filebrowser.db # Change to match your directory
+      - /mnt/sdb1/.docker/filebrowser/settings.json:/config/settings.json # Change to match your directory
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    ports:
+      - 8095:80 # Change the port if needed
